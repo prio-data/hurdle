@@ -1,0 +1,20 @@
+name: Publish
+on:
+  push:
+    branches: [main]
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    name: "Build And Publish"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: "Dependencies"
+        run: pip install poetry twine
+      - name: "Build"
+        run: poetry build
+      - name: "Publish"
+        run: |
+          twine upload dist/* --skip-existing --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}

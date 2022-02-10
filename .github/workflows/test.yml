@@ -1,0 +1,21 @@
+name: Unittests 
+on: 
+   push:
+      branches: [main]
+   pull_request:
+      branches: [main]
+jobs:
+   run-tests:
+      runs-on: ubuntu-latest
+      name: "Run tests"
+      steps:
+         - uses: actions/checkout@v2
+         - uses: actions/setup-python@v2
+           with:
+              python-version: "3.8"
+         - name: "Dependencies"
+           run: |
+              pip install poetry
+              poetry install 
+         - name: "Run tests"
+           run: $(poetry env info -p)/bin/python -m unittest

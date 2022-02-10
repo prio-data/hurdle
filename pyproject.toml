@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "hurdle"
+version = "0.1.0"
+description = "Scikit hurdle estimator"
+readme = "README.md"
+homepage = "https://www.github.com/prio-data/hurdle"
+authors = ["peder2911 <pglandsverk@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+scikit-learn = "^1.0.2"
+
+[tool.poetry.dev-dependencies]
+jedi = "^0.18.1"
+pylint = "^2.12.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
