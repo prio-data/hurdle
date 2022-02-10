@@ -7,6 +7,15 @@ This package contains an implementation of Hurdle Regression, based in part on
 [Geoff Ruddocks implementation](https://geoffruddock.com/building-a-hurdle-regression-estimator-in-scikit-learn/)
 and Håvard Hegres 2022 adaption of his implementation.
 
+## Installation
+
+```
+pip install hurdle
+```
+
+To use the `hurdle.menu_hurdle_estimator.MenuHurdleEstimator` module you also
+need to install the `xgboost` and `lightgbm` packages.
+
 ## Usage
 
 ```

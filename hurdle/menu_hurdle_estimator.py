@@ -21,13 +21,19 @@ class MenuHurdleEstimator(hurdle.HurdleEstimator):
                  reg_params: Optional[dict] = None,
                  n_jobs: int = 4):
 
-        self._n_jobs = n_jobs
+        self.clf_params = clf_params if clf_params is not None else {}
+        self.reg_params = reg_params if reg_params is not None else {}
 
-        threshold_estimator = self._resolve_estimator(clf_name)
-        threshold_estimator.set_params(**clf_params)
+        self.clf_name = clf_name
+        self.reg_name = reg_name
 
-        regression_estimator = self._resolve_estimator(reg_name)
-        regression_estimator.set_params(**reg_params)
+        self.n_jobs = n_jobs
+
+        threshold_estimator = self._resolve_estimator(self.clf_name)
+        threshold_estimator.set_params(**self.clf_params)
+
+        regression_estimator = self._resolve_estimator(self.reg_name)
+        regression_estimator.set_params(**self.reg_params)
 
         super().__init__(threshold_estimator, regression_estimator)
 
@@ -40,15 +46,22 @@ class MenuHurdleEstimator(hurdle.HurdleEstimator):
                  'logistic':       linear_model.LogisticRegression(solver = 'liblinear'),
                  'LGBMRegressor':  LGBMRegressor(n_estimators = 100),
                  'LGBMClassifier': LGBMClassifier(n_estimators = 100),
-                 'RFRegressor':    XGBRFRegressor(n_estimators = 300, n_jobs = self._n_jobs),
-                 'RFClassifier':   XGBRFClassifier(n_estimators = 300, n_jobs = self._n_jobs),
+                 'RFRegressor':    XGBRFRegressor(n_estimators = 300, n_jobs = self.n_jobs),
+                 'RFClassifier':   XGBRFClassifier(n_estimators = 300, n_jobs = self.n_jobs),
                  'GBMRegressor':   ensemble.GradientBoostingRegressor(n_estimators = 200),
                  'GBMClassifier':  ensemble.GradientBoostingClassifier(n_estimators = 200),
-                 'XGBRegressor':   XGBRegressor(n_estimators = 200, tree_method = 'hist', n_jobs = self._n_jobs),
-                 'XGBClassifier':  XGBClassifier(n_estimators = 200, tree_method = 'hist', n_jobs = self._n_jobs, use_label_encoder = False),
+                 'XGBRegressor':   XGBRegressor(n_estimators = 200, tree_method = 'hist', n_jobs = self.n_jobs),
+                 'XGBClassifier':  XGBClassifier(n_estimators = 200, tree_method = 'hist', n_jobs = self.n_jobs, use_label_encoder = False),
                  'HGBRegressor':   ensemble.HistGradientBoostingRegressor(max_iter = 200),
                  'HGBClassifier':  ensemble.HistGradientBoostingClassifier(max_iter = 200),
                 }
 
         return funcs[func_name]
-
+    
+    @property
+    def clf_fi(self):
+        return self.threshold_estimator.feature_importances_
+    
+    @property
+    def reg_fi(self):
+        return self.regression_estimator.feature_importances_
