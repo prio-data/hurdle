@@ -1,7 +1,9 @@
 [tool.poetry]
 name = "hurdle"
 version = "0.1.0"
-description = ""
+description = "Scikit hurdle estimator"
+readme = "README.md"
+homepage = "https://www.github.com/prio-data/hurdle"
 authors = ["peder2911 <pglandsverk@gmail.com>"]
 
 [tool.poetry.dependencies]

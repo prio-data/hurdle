@@ -1,9 +1,8 @@
 
-from operator import and_
-from functools import reduce
 import numpy as np
 from sklearn import base
 from sklearn.utils import validation
+from sklearn.exceptions import NotFittedError
 
 class HurdleEstimator(base.BaseEstimator):
 
@@ -11,11 +10,8 @@ class HurdleEstimator(base.BaseEstimator):
             threshold_estimator: base.BaseEstimator,
             regression_estimator: base.BaseEstimator):
 
-        self._threshold_estimator = threshold_estimator
-        self._regression_estimator = regression_estimator
-
-        self.threshold_feature_importances_ = []
-        self.regression_feature_importances_ = []
+        self.threshold_estimator = threshold_estimator
+        self.regression_estimator = regression_estimator
 
     def fit(self,
             X: np.ndarray,
@@ -29,11 +25,8 @@ class HurdleEstimator(base.BaseEstimator):
         if X.shape[1] < 2:
             raise ValueError('Cannot fit model when n_features = 1')
 
-        self._threshold_estimator.fit(X, y > 0)
-        self.threshold_feature_importances_ = self._threshold_estimator.feature_importances_
-
-        self._regression_estimator.fit(X[y > 0], y[y > 0])
-        self.regression_feature_importances_ = self._regression_estimator.feature_importances_
+        self.threshold_estimator.fit(X, y > 0)
+        self.regression_estimator.fit(X[y > 0], y[y > 0])
 
         return self
 
@@ -42,9 +35,9 @@ class HurdleEstimator(base.BaseEstimator):
         validation.check_is_fitted(self)
 
         threshold_predict_method = "predict_proba" if not binary else "predict"
-        threshold_predict = getattr(self._threshold_estimator, threshold_predict_method)
+        threshold_predict = getattr(self.threshold_estimator, threshold_predict_method)
         threshold = threshold_predict(X)[:, 1]
-        regression = self._regression_estimator.predict(X)
+        regression = self.regression_estimator.predict(X)
         return threshold * regression
 
     def predict(self, X: np.ndarray):
@@ -56,6 +49,14 @@ class HurdleEstimator(base.BaseEstimator):
         return self._predict(X, binary = True)
 
     def __sklearn_is_fitted__(self):
-        return reduce(and_, (
-            validation.check_is_fitted(self._regression_estimator),
-            validation.check_is_fitted(self._threshold_estimator)), True)
+        return (
+            self._is_fitted(self.regression_estimator) &
+            self._is_fitted(self.threshold_estimator))
+
+    @staticmethod
+    def _is_fitted(estimator: base.BaseEstimator) -> bool:
+        try:
+            validation.check_is_fitted(estimator)
+            return True
+        except NotFittedError:
+            return False
