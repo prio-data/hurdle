@@ -9,7 +9,7 @@ try:
 
     from lightgbm import LGBMClassifier, LGBMRegressor
 except ImportError:
-    raise ImportError("the menu_hurdle_estimator requires xboost and lightgbm. Please install before running") 
+    raise ImportError("the menu_hurdle_estimator requires xboost and lightgbm. Please install before running")
 
 from . import hurdle
 
